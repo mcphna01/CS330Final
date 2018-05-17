@@ -1,0 +1,44 @@
+{%extends "finalbase.html"%}
+
+{%block content%}
+<h1>Countries</h1>
+<p>Countries with government form of <b>{{govform}}</b> and their life expectencies. Click on a country to view income levels.</p>
+<table class="table table-hover text-centered">
+	<th>Country</th>
+	<th>Life Expectancy</th>
+	{%for gov in res%}
+	<tr>
+		<td id='{{gov}}' onclick='test("{{gov.split(' ')[0]}}")'>{{gov}}</td>
+		<td>{{lifeexp[gov]}}</td>
+	</tr>
+	{%endfor%}
+</table>
+
+<div class="col-xs-2">
+<form action="/">
+    <button type="submit" class="form-control btn btn-success">Return to Home</button>
+</form>
+</div>
+<script>
+	"use strict"
+
+	function test(x){
+		fetch('https://restcountries.eu/rest/v2/name/'+x)
+	    .then((res)=>res.json())
+	    .then((data)=>{
+	        let iso=data[0].alpha3Code
+        	fetch('http://api.worldbank.org/v2/countries/'+iso+'?format=json')
+        	.then((res)=>res.json())
+        	.then((data)=>{
+	        	let change=document.getElementById(x)
+	        	try{
+	        		change.innerHTML=data[1][0].incomeLevel.value
+	        	}
+	        	catch(err){
+	        		change.innerHTML="information not available"
+	        	}     
+	    	})
+	    })
+	}
+</script>
+{%endblock%}
